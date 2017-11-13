@@ -1,17 +1,20 @@
+package connection;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.*;
 import java.util.List;
 import java.util.Scanner;
 
-public class Servidor
+public class Server
 {
-	List<PrintStream> list;
+	List<PrintStream> _clientList;
 	
 	public static void main(String args[]) throws IOException 
 	{
-		ServerSocket servidor = new ServerSocket(12345);
-		System.out.println("Porta 12345 aberta!");
+		ServerSocket servidor = new ServerSocket(5000);
+		System.out.println("Porta 5000 aberta!");
 		
 		
 		//while(true) pega cliente e dispara thread
@@ -35,9 +38,9 @@ public class Servidor
 	
 	void distribuiMensagem(String msg) 
 	{
-		for(PrintStream out_cli : list) 
+		for(PrintStream client : _clientList) 
 		{
-			out_cli.println(msg);
+			client.println(msg);
 		}
-	} 
+	}
 }
