@@ -1,10 +1,9 @@
 package connection;
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -13,10 +12,13 @@ public class Server
 	class ServerThread implements Runnable
 	{
 		private Socket cliente;
+		private PrintStream ps;
+		private String nickname;
 		
-		public ServerThread(Socket cli)
+		public ServerThread(Socket cli, PrintStream p)
 		{
 			cliente = cli;
+			ps = p;
 		}
 		
 		public void run()
@@ -28,11 +30,23 @@ public class Server
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			do
+			{
+				ps.println("Informe um nickname: ");
+				if(in.hasNextLine())
+				{
+					nickname = in.nextLine();
+				}
+			} while(_nicknames.containsValue(nickname));
+			
+			_nicknames.put(1, nickname);
+			
 			while (in.hasNextLine()) 
 			{
 				String msg = in.nextLine();
-				System.out.println(msg);
-				distribuiMensagem(msg);
+				System.out.println(nickname + ": " + msg);
+				distribuiMensagem(msg, nickname);
 			}
 			
 			in.close();
@@ -51,9 +65,20 @@ public class Server
 				e.printStackTrace();
 			}
 		}
+		
+		public PrintStream GetPrintStream()
+		{
+			return ps;
+		}
+		
+		public String GetNickname()
+		{
+			return nickname;
+		}
 	}
 	
-	List<PrintStream> _clientList;
+	HashMap<Integer, String> _nicknames;
+	List<ServerThread> _serverThreads;
 	
 	public static void main(String args[]) throws IOException 
 	{
@@ -62,7 +87,9 @@ public class Server
 	
 	public Server() 
 	{
-		_clientList = new ArrayList<PrintStream>();
+		_nicknames = new HashMap<Integer, String>();
+		_serverThreads = new ArrayList<ServerThread>();
+		
 		ServerSocket servidor = null;
 		try {
 			servidor = new ServerSocket(5000);
@@ -84,20 +111,17 @@ public class Server
 			}
 			
 			System.out.println("Nova conexão com o cliente " + cliente.getInetAddress().getHostAddress());
-			
+						
+			ServerThread st = null;
 			try {
-				_clientList.add(new PrintStream(cliente.getOutputStream()));
+				st = new ServerThread(cliente, new PrintStream(cliente.getOutputStream()));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			catch (NullPointerException e) {
-				// TODO: handle exception
-				e.printStackTrace();
-			}
-			
-			new Thread(new ServerThread(cliente)).start();
-		} while (!_clientList.isEmpty());
+			_serverThreads.add(st);
+			new Thread(st).start();
+		} while (!_serverThreads.isEmpty());
 		
 		try {
 			servidor.close();
@@ -108,11 +132,15 @@ public class Server
 		System.out.println("O servidor terminou de executar!");
 	}
 	
-	void distribuiMensagem(String msg) 
+	void distribuiMensagem(String msg, String nick) 
 	{
-		for(PrintStream client : _clientList) 
+		for(ServerThread client : _serverThreads) 
 		{
-			client.println(msg);
+			if(client.GetNickname() != nick)
+			{
+				String str = nick + ": " + msg;
+				client.GetPrintStream().println(str);
+			}
 		}
 	}
 }
