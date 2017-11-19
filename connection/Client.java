@@ -6,27 +6,75 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-public class Client extends Thread
+public class Client
 {
+	class ClientThread implements Runnable
+	{
+		private Socket _socket;
+		
+		public ClientThread(Socket socket)
+		{
+			_socket = socket;
+		}
+		
+		public void run()
+		{
+			Scanner in_serv;
+			try {
+				in_serv = new Scanner(this._socket.getInputStream());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return;
+			}
+			while (in_serv.hasNextLine()) 
+			{
+				System.out.println(in_serv.nextLine());
+			}
+			
+			in_serv.close();
+		}
+	}
+	
 	private Scanner _serverScanner;
 	private Socket _socket;
 	
 	public PrintStream ps;
 	
-	public Client(Socket socket)
+	public Client()
 	{
-		this._socket = socket;
+		try {
+			_socket = new Socket("127.0.0.1", 5000);
+			System.out.println("O cliente se conectou ao servidor!");
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		this.ps = new PrintStream(System.out);
+		ps = new PrintStream(System.out);
+		
+		new Thread(new ClientThread(_socket)).start();
+		Execute();
 	}
 	
 	public static void main(String[] args) throws UnknownHostException, IOException 
 	{
-		Socket cli = new Socket("127.0.0.1", 5000);
-		System.out.println("O cliente se conectou ao servidor!");
-		
+		new Client();
+	}
+	
+	void Execute()
+	{
 		Scanner teclado = new Scanner(System.in);
-		PrintStream saida = new PrintStream(cli.getOutputStream());
+		PrintStream saida = null;
+		try {
+			saida = new PrintStream(_socket.getOutputStream());
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		String msg = teclado.nextLine();
 		while(msg.compareTo("###")!=0) 
@@ -37,30 +85,12 @@ public class Client extends Thread
 
 		saida.close();
 		teclado.close();
-		cli.close();
-		System.out.println("O cliente terminou de executar!");
-	}
-	
-	public void run()
-	{
-		Scanner in_serv;
 		try {
-			in_serv = new Scanner(this._socket.getInputStream());
+			_socket.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return;
 		}
-		while (in_serv.hasNextLine()) 
-		{
-			System.out.println(in_serv.nextLine());
-		}
-		
-		in_serv.close();
-	}
-	
-	public void println(String msg)
-	{
-		
+		System.out.println("O cliente terminou de executar!");
 	}
 }
