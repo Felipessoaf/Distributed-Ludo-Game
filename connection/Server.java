@@ -9,23 +9,46 @@ import java.util.Scanner;
 
 public class Server
 { 
+	class Room
+	{
+		private List<ServerThread> _players;
+		
+		public Room()
+		{
+			_players = new ArrayList<ServerThread>();
+		}
+		
+		public boolean AddPlayer(ServerThread st)
+		{
+			if(_players.size() == 4)
+			{
+				return false;
+			}
+			
+			_players.add(st);		
+			return true;
+		}
+	}
+	
 	class ServerThread implements Runnable
 	{
-		private Socket cliente;
-		private PrintStream ps;
-		private String nickname;
+		private Socket _cliente;
+		private PrintStream _ps;
+		private String _nickname;
+		private boolean _ready;
 		
 		public ServerThread(Socket cli, PrintStream p)
 		{
-			cliente = cli;
-			ps = p;
+			_cliente = cli;
+			_ps = p;
+			_ready = false;
 		}
 		
 		public void run()
 		{
 			Scanner in = null;
 			try {
-				in = new Scanner(cliente.getInputStream());
+				in = new Scanner(_cliente.getInputStream());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -33,20 +56,20 @@ public class Server
 			
 			do
 			{
-				ps.println("Informe um nickname: ");
+				_ps.println("Informe um nickname: ");
 				if(in.hasNextLine())
 				{
-					nickname = in.nextLine();
+					_nickname = in.nextLine();
 				}
-			} while(_nicknames.containsValue(nickname));
+			} while(_nicknames.containsValue(_nickname));
 			
-			_nicknames.put(1, nickname);
+			_nicknames.put(1, _nickname);
 			
 			while (in.hasNextLine()) 
 			{
 				String msg = in.nextLine();
-				System.out.println(nickname + ": " + msg);
-				distribuiMensagem(msg, nickname);
+				System.out.println(_nickname + ": " + msg);
+				distribuiMensagem(msg, _nickname);
 			}
 			
 			in.close();
@@ -59,7 +82,7 @@ public class Server
 //			}
 			
 			try {
-				cliente.close();
+				_cliente.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -68,12 +91,12 @@ public class Server
 		
 		public PrintStream GetPrintStream()
 		{
-			return ps;
+			return _ps;
 		}
 		
 		public String GetNickname()
 		{
-			return nickname;
+			return _nickname;
 		}
 	}
 	
