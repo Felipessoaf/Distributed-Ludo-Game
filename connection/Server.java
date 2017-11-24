@@ -11,10 +11,12 @@ public class Server
 { 
 	class Room
 	{
+		public int RoomId;
 		private List<ServerThread> _players;
 		
-		public Room()
+		public Room(int id)
 		{
+			RoomId = id;
 			_players = new ArrayList<ServerThread>();
 		}
 		
@@ -25,9 +27,48 @@ public class Server
 				return false;
 			}
 			
-			_players.add(st);		
+			_players.add(st);	
+			
+			if(_players.size() == 4)
+			{
+				//start game
+				for(ServerThread client : _players) 
+				{
+					String str = "Room: " + RoomId;
+					client.GetPrintStream().println(str);
+				}
+			}
 			return true;
 		}
+	}
+	
+	class Game implements Runnable
+	{
+		public int GameId;
+		private List<ServerThread> _players;
+		
+		Game(int id, List<ServerThread> players)
+		{
+			players = _players;
+			GameId = id;
+		}
+		
+		public void run() 
+		{
+			//start game
+			for(ServerThread client : _players) 
+			{
+				String str = "Start. Room: " + GameId;
+				client.GetPrintStream().println(str);
+			}
+			
+			while(true)
+			{
+				
+			}
+			
+		}
+		
 	}
 	
 	class ServerThread implements Runnable
@@ -64,6 +105,11 @@ public class Server
 			} while(_nicknames.containsValue(_nickname));
 			
 			_nicknames.put(1, _nickname);
+			if(_rooms.isEmpty() || !_rooms.get(_rooms.size()-1).AddPlayer(this))
+			{
+				_rooms.add(new Room(_rooms.size()));
+				_rooms.get(_rooms.size()-1).AddPlayer(this);
+			}
 			
 			while (in.hasNextLine()) 
 			{
@@ -100,8 +146,10 @@ public class Server
 		}
 	}
 	
+	
 	HashMap<Integer, String> _nicknames;
 	List<ServerThread> _serverThreads;
+	List<Room> _rooms;
 	
 	public static void main(String args[]) throws IOException 
 	{
@@ -112,6 +160,7 @@ public class Server
 	{
 		_nicknames = new HashMap<Integer, String>();
 		_serverThreads = new ArrayList<ServerThread>();
+		_rooms = new ArrayList<Room>();
 		
 		ServerSocket servidor = null;
 		try {

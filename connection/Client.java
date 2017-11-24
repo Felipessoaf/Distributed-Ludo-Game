@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+import com.sun.xml.internal.ws.api.Cancelable;
+
 public class Client
 {
 	class ClientThread implements Runnable
@@ -27,6 +29,7 @@ public class Client
 				e.printStackTrace();
 				return;
 			}
+			
 			while (in_serv.hasNextLine()) 
 			{
 				System.out.println(in_serv.nextLine());
@@ -38,6 +41,7 @@ public class Client
 	
 	private Scanner _serverScanner;
 	private Socket _socket;
+	private boolean _canPlay;
 	
 	public PrintStream ps;
 	
@@ -75,6 +79,8 @@ public class Client
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+
+		while(!_canPlay){}
 		
 		String msg = teclado.nextLine();
 		while(msg.compareTo("###")!=0) 
