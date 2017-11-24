@@ -32,11 +32,12 @@ public class Server
 			if(_players.size() == 4)
 			{
 				//start game
-				for(ServerThread client : _players) 
+				/*for(ServerThread client : _players) 
 				{
 					String str = "Room: " + RoomId;
 					client.GetPrintStream().println(str);
-				}
+				}*/
+				new Thread(new Game(RoomId, _players)).start();
 			}
 			return true;
 		}
@@ -62,10 +63,12 @@ public class Server
 				client.GetPrintStream().println(str);
 			}
 			
-			while(true)
+			System.out.println("Game Started");
+			
+			/*while(true)
 			{
 				
-			}
+			}*/
 			
 		}
 		

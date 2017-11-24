@@ -6,8 +6,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-import com.sun.xml.internal.ws.api.Cancelable;
-
 public class Client
 {
 	class ClientThread implements Runnable
