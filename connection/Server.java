@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class Server
 { 
@@ -13,6 +14,7 @@ public class Server
 	{
 		public int RoomId;
 		private List<ServerThread> _players;
+		private Game _game;
 		
 		public Room(int id)
 		{
@@ -37,9 +39,21 @@ public class Server
 					String str = "Room: " + RoomId;
 					client.GetPrintStream().println(str);
 				}*/
-				new Thread(new Game(RoomId, _players)).start();
+				_game = new Game(RoomId, _players);
+				new Thread(_game).start();
 			}
 			return true;
+		}
+		
+		public List<ServerThread> GetServerThreads()
+		{
+			return _players;
+		}
+		
+		public void RemovePlayer(ServerThread pl)
+		{
+			_players.remove(pl);
+			_game.RemovePlayer(pl);
 		}
 	}
 	
@@ -72,6 +86,11 @@ public class Server
 			
 		}
 		
+		public void RemovePlayer(ServerThread pl)
+		{
+			_players.remove(pl);
+		}
+		
 	}
 	
 	class ServerThread implements Runnable
@@ -80,6 +99,7 @@ public class Server
 		private PrintStream _ps;
 		private String _nickname;
 		private boolean _ready;
+		private Room _room;
 		
 		public ServerThread(Socket cli, PrintStream p)
 		{
@@ -112,26 +132,36 @@ public class Server
 				_nicknames.put(_nicknames.size(), _nickname);
 				if(_rooms.isEmpty() || !_rooms.get(_rooms.size()-1).AddPlayer(this))
 				{
-					_rooms.add(new Room(_rooms.size()));
+					_room = new Room(_rooms.size());
+					_rooms.add(_room);
 					_rooms.get(_rooms.size()-1).AddPlayer(this);
+				}
+				else
+				{
+					_room = _rooms.get(_rooms.size()-1);
 				}
 				
 				while (in.hasNextLine()) 
 				{
 					String msg = in.nextLine();
-					System.out.println(_nickname + ": " + msg);
-					distribuiMensagem(msg, _nickname);
+					if(Pattern.matches(msg, "Desconectar"))
+					{
+						distribuiMensagem("Desconectando...", _nickname, _room.GetServerThreads());
+						_room.RemovePlayer(this);
+					}
+					else if(Pattern.matches(msg, "Jogada"))
+					{
+						
+					} 
+					else
+					{
+						System.out.println(_nickname + ": " + msg);
+						distribuiMensagem(msg, _nickname, _room.GetServerThreads());
+					}
 				}
 			//}
 			
 			in.close();
-			
-//			try {
-//				_clientList.remove(cliente.getOutputStream());
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
 			
 			try {
 				_cliente.close();
@@ -210,9 +240,9 @@ public class Server
 		System.out.println("O servidor terminou de executar!");
 	}
 	
-	void distribuiMensagem(String msg, String nick) 
+	void distribuiMensagem(String msg, String nick, List<ServerThread> st) 
 	{
-		for(ServerThread client : _serverThreads) 
+		for(ServerThread client : st) 
 		{
 			if(client.GetNickname() != nick)
 			{

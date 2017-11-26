@@ -133,6 +133,7 @@ public class Client
 	
 	void End()
 	{		
+		_saida.println("Desconectar");
 		_saida.close();
 		_teclado.close();
 		try {
