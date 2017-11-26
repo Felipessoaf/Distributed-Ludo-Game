@@ -42,6 +42,7 @@ public class Client
 				} 
 				else if(Pattern.matches(msg, "Turno"))
 				{
+					System.out.println("meu turno");
 					_canPlay = true;
 				} 
 				else if(Pattern.matches(msg, "Desconectar"))
@@ -167,7 +168,8 @@ public class Client
 		if(msg.compareTo("End")!=0 && _canPlay) 
 		{
 			_saida.println(msg);
-			_saida.print("FimTurno");
+			_saida.println("FimTurno");
+			System.out.println("mandei fimturno pro server");
 			_canPlay = false;
 			Turn();
 		}

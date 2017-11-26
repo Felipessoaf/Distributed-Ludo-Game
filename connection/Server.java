@@ -129,7 +129,7 @@ public class Server
 						  }
 					  }
 				};
-				_timer.schedule(_timerTask, 5000);//60*1000);
+				//_timer.schedule(_timerTask, 60*1000);
 				
 				_currentPlayer.GetPrintStream().println("Turno");
 				while(!_nextPlayer)
@@ -143,6 +143,7 @@ public class Server
 				}
 
 				_canTimeout = false;
+				_nextPlayer = false;
 				_timerTask.cancel();
 				_timer.cancel();
 			}
@@ -207,19 +208,21 @@ public class Server
 		{
 		    if (obj == null) 
 		    {
-				System.out.println("equals null");
 		        return false;
 		    }
-		    if (!ServerThread.class.isAssignableFrom(obj.getClass())) 
+		    if (this == obj)
 		    {
-				System.out.println("equals not class");
+				System.out.println("equals");
+                return true;	
+		    }
+		    if (getClass() != obj.getClass()) 
+		    {
 		        return false;
 		    }
 		    final ServerThread other = (ServerThread) obj;
 		    
 		    if (this._nickname != other._nickname) 
 		    {
-				System.out.println("equals not nick");
 		        return false;
 		    }
 			System.out.println("equals");
@@ -301,6 +304,7 @@ public class Server
 					}
 					else if(Pattern.matches(msg, "FimTurno"))
 					{
+						System.out.println("Serverfimturno");
 						_room.EndTurn();
 					} 
 					else if(Pattern.matches(msg, "Start"))

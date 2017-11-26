@@ -3,5 +3,4 @@ regex
 
 bug:
 -ultimo player espera input pra terminar
--remoçao
--turno nao mandando evento
+-indexof na remoçao
