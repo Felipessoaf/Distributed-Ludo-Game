@@ -5,23 +5,23 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class Client
 {
 	class ClientThread implements Runnable
 	{
-		private Socket _socket;
-		
-		public ClientThread(Socket socket)
+		public ClientThread()
 		{
-			_socket = socket;
+			
 		}
 		
 		public void run()
 		{
 			Scanner in_serv;
+			String msg;
 			try {
-				in_serv = new Scanner(this._socket.getInputStream());
+				in_serv = new Scanner(_socket.getInputStream());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -30,7 +30,21 @@ public class Client
 			
 			while (in_serv.hasNextLine()) 
 			{
-				System.out.println(in_serv.nextLine());
+				msg = in_serv.nextLine();
+				if(Pattern.matches(msg, "Informe um nickname: "))
+				{
+					Nickname();
+				} 
+				else if(Pattern.matches(msg, "Start. Room: 0"))
+				{
+					int gameId = Integer.parseInt(msg.substring(13));
+					System.out.println("Começando partida na sala " + gameId);
+					_canPlay = true;
+				}
+				else
+				{
+					System.out.println(msg);
+				}
 			}
 			
 			in_serv.close();
@@ -39,11 +53,26 @@ public class Client
 	
 	private Scanner _serverScanner;
 	private Socket _socket;
+	
+	private Scanner _teclado;
+	private PrintStream _saida;
+	
 	private boolean _canPlay;
 	
 	public PrintStream ps;
 	
 	public Client()
+	{
+		Init();
+		Play();
+	}
+	
+	public static void main(String[] args) throws UnknownHostException, IOException 
+	{
+		new Client();
+	}
+	
+	void Init()
 	{
 		try {
 			_socket = new Socket("127.0.0.1", 5000);
@@ -58,37 +87,55 @@ public class Client
 		
 		ps = new PrintStream(System.out);
 		
-		new Thread(new ClientThread(_socket)).start();
-		Execute();
-	}
-	
-	public static void main(String[] args) throws UnknownHostException, IOException 
-	{
-		new Client();
-	}
-	
-	void Execute()
-	{
-		Scanner teclado = new Scanner(System.in);
-		PrintStream saida = null;
+		new Thread(new ClientThread()).start();
+		
+		_teclado = new Scanner(System.in);
+		_saida = null;
 		try {
-			saida = new PrintStream(_socket.getOutputStream());
+			_saida = new PrintStream(_socket.getOutputStream());
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
-		while(!_canPlay){}
 		
-		String msg = teclado.nextLine();
+		_canPlay = false;
+	}
+	
+	void Nickname()
+	{		
+		System.out.println("Informe um Nickname: ");
+		String msg = _teclado.nextLine();
+		_saida.println(msg);
+	}
+	
+	void Play()
+	{		
+		while(!_canPlay)
+		{
+			//System.out.println(".....");
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+			
+		System.out.println("Digite uma msg: ");
+		String msg = _teclado.nextLine();
 		while(msg.compareTo("###")!=0) 
 		{
-			saida.println(msg);
-			msg = teclado.nextLine();
-		}		
-
-		saida.close();
-		teclado.close();
+			_saida.println(msg);
+			msg = _teclado.nextLine();
+		}
+		
+		End();
+	}
+	
+	void End()
+	{		
+		_saida.close();
+		_teclado.close();
 		try {
 			_socket.close();
 		} catch (IOException e) {

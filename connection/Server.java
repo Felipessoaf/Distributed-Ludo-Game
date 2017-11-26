@@ -50,7 +50,7 @@ public class Server
 		
 		Game(int id, List<ServerThread> players)
 		{
-			players = _players;
+			_players = players;
 			GameId = id;
 		}
 		
@@ -63,7 +63,7 @@ public class Server
 				client.GetPrintStream().println(str);
 			}
 			
-			System.out.println("Game Started");
+			System.out.println("Game " + GameId + " started");
 			
 			/*while(true)
 			{
