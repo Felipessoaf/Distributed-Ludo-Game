@@ -107,19 +107,22 @@ public class Server
 				}
 			} while(_nicknames.containsValue(_nickname));
 			
-			_nicknames.put(1, _nickname);
-			if(_rooms.isEmpty() || !_rooms.get(_rooms.size()-1).AddPlayer(this))
-			{
-				_rooms.add(new Room(_rooms.size()));
-				_rooms.get(_rooms.size()-1).AddPlayer(this);
-			}
-			
-			while (in.hasNextLine()) 
-			{
-				String msg = in.nextLine();
-				System.out.println(_nickname + ": " + msg);
-				distribuiMensagem(msg, _nickname);
-			}
+//			if(in.hasNextLine())
+//			{
+				_nicknames.put(_nicknames.size(), _nickname);
+				if(_rooms.isEmpty() || !_rooms.get(_rooms.size()-1).AddPlayer(this))
+				{
+					_rooms.add(new Room(_rooms.size()));
+					_rooms.get(_rooms.size()-1).AddPlayer(this);
+				}
+				
+				while (in.hasNextLine()) 
+				{
+					String msg = in.nextLine();
+					System.out.println(_nickname + ": " + msg);
+					distribuiMensagem(msg, _nickname);
+				}
+			//}
 			
 			in.close();
 			
