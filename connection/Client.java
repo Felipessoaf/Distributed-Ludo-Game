@@ -196,7 +196,16 @@ public class Client
 		System.out.println("end after _saida");
 		_saida.close();
 		System.out.println("end after _saida close");
-		_teclado.close();
+
+		try
+		{
+			_teclado.close();
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		
 		System.out.println("end after _teclado close");
 		try {
 			_socket.close();

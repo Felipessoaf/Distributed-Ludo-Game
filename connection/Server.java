@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 
 public class Server
@@ -128,7 +129,7 @@ public class Server
 						  }
 					  }
 				};
-				_timer.schedule(_timerTask, 60*1000);
+				_timer.schedule(_timerTask, 5000);//60*1000);
 				
 				_currentPlayer.GetPrintStream().println("Turno");
 				while(!_nextPlayer)
@@ -150,19 +151,23 @@ public class Server
 		
 		public void RemovePlayer(ServerThread pl)
 		{
-			System.out.println("Removendo player " + _players.indexOf(pl));
-			if(_players.indexOf(pl) <= _currentPlayerIndex)
+			int index = _players.indexOf(pl);
+			System.out.println("Removendo player " + index);
+			if(index >= 0)
 			{
-				_currentPlayerIndex--;
-				if(_currentPlayerIndex < 0)
+				if(index <= _currentPlayerIndex)
 				{
-					_currentPlayerIndex = _players.size()-1;
+					_currentPlayerIndex--;
+					if(_currentPlayerIndex < 0)
+					{
+						_currentPlayerIndex = _players.size()-1;
+					}
 				}
-			}
-			_players.remove(pl);
-			if(_players.size() == 1)
-			{
-				EndGame();
+				_players.remove(pl);
+				if(_players.size() == 1)
+				{
+					EndGame();
+				}
 			}
 		}
 		
@@ -187,6 +192,7 @@ public class Server
 		private boolean _canTimeout;
 		private Timer _timer;
 		private TimerTask _timerTask;
+		private int _roomId;
 		
 		public ServerThread(Socket cli, PrintStream p)
 		{
@@ -194,6 +200,30 @@ public class Server
 			_ps = p;
 			_ready = false;
 			_canTimeout = true;
+		}
+		
+		@Override
+		public boolean equals(Object obj) 
+		{
+		    if (obj == null) 
+		    {
+				System.out.println("equals null");
+		        return false;
+		    }
+		    if (!ServerThread.class.isAssignableFrom(obj.getClass())) 
+		    {
+				System.out.println("equals not class");
+		        return false;
+		    }
+		    final ServerThread other = (ServerThread) obj;
+		    
+		    if (this._nickname != other._nickname) 
+		    {
+				System.out.println("equals not nick");
+		        return false;
+		    }
+			System.out.println("equals");
+		    return true;
 		}
 		
 		public void run()
@@ -220,13 +250,16 @@ public class Server
 				_nicknames.put(_nicknames.size(), _nickname);
 				if(_rooms.isEmpty() || !_rooms.get(_rooms.size()-1).AddPlayer(this))
 				{
-					_room = new Room(_rooms.size());
+					_roomId = _rooms.size();
+					_room = new Room(_roomId);
 					_rooms.add(_room);
-					_rooms.get(_rooms.size()-1).AddPlayer(this);
+					_rooms.get(_roomId).AddPlayer(this);
+					_lock.add(new ReentrantLock());
 				}
 				else
 				{
-					_room = _rooms.get(_rooms.size()-1);
+					_roomId = _rooms.size()-1;
+					_room = _rooms.get(_roomId);
 				}
 				
 				_timer = new Timer();
@@ -248,8 +281,23 @@ public class Server
 					String msg = in.nextLine();
 					if(Pattern.matches(msg, "Desconectar"))
 					{
-						distribuiMensagem("Desconectando...", _nickname, _room.GetServerThreads());
-						_room.RemovePlayer(this);
+						_lock.get(_roomId).lock();
+						try
+						{
+							distribuiMensagem("Desconectando...", _nickname, _room.GetServerThreads());
+							
+							try {
+								Thread.sleep(500);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+							_room.RemovePlayer(this);
+						}
+						finally {
+							_lock.get(_roomId).unlock();
+						}
 					}
 					else if(Pattern.matches(msg, "FimTurno"))
 					{
@@ -302,6 +350,7 @@ public class Server
 	HashMap<Integer, String> _nicknames;
 	List<ServerThread> _serverThreads;
 	List<Room> _rooms;
+	List<ReentrantLock> _lock;
 	
 	public static void main(String args[]) throws IOException 
 	{
@@ -313,6 +362,7 @@ public class Server
 		_nicknames = new HashMap<Integer, String>();
 		_serverThreads = new ArrayList<ServerThread>();
 		_rooms = new ArrayList<Room>();
+		_lock = new ArrayList<ReentrantLock>();
 		
 		ServerSocket servidor = null;
 		try {
