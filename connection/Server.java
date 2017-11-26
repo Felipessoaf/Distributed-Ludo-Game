@@ -173,6 +173,10 @@ public class Server
 						_canTimeout = false;
 						System.out.println("Timeout false");
 					} 
+					else if(Pattern.matches(msg, "Finished"))
+					{
+						  _ps.println("Desconectar");
+					} 
 					else
 					{
 						System.out.println(_nickname + ": " + msg);

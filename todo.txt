@@ -1,5 +1,4 @@
 regex
-retirar o jogador que terminar o jogo
 acabar partida se tiver só 1 jogador
 acabar partida se timeout 1 min de um jogador
 acabar partida se receber msg de fechar janela do cliente
