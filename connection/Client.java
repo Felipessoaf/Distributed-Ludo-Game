@@ -35,11 +35,11 @@ public class Client
 				{
 					Nickname();
 				} 
-				else if(Pattern.matches(msg, "Start. Room: 0"))
-				{
-					int gameId = Integer.parseInt(msg.substring(13));
-					System.out.println("Começando partida na sala " + gameId);
-				} 
+//				else if(Pattern.matches(msg, "Start. Room: 0"))
+//				{
+//					int gameId = Integer.parseInt(msg.substring(13));
+//					System.out.println("Começando partida na sala " + gameId);
+//				} 
 				else if(Pattern.matches(msg, "Turno"))
 				{
 					System.out.println("meu turno");

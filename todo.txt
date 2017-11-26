@@ -1,6 +1,3 @@
-regex
-
-
 bug:
 -ultimo player espera input pra terminar
 -indexof na remoçao
