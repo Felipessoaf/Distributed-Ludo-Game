@@ -39,6 +39,9 @@ public class Client
 				{
 					int gameId = Integer.parseInt(msg.substring(13));
 					System.out.println("Começando partida na sala " + gameId);
+				} 
+				else if(Pattern.matches(msg, "Turno"))
+				{
 					_canPlay = true;
 				} 
 				else if(Pattern.matches(msg, "Desconectar"))
@@ -70,7 +73,7 @@ public class Client
 	public Client()
 	{
 		Init();
-		Play();
+		Turn();
 	}
 	
 	public static void main(String[] args) throws UnknownHostException, IOException 
@@ -140,6 +143,39 @@ public class Client
 		}
 		
 		End();
+	}
+	
+	void Turn()
+	{		
+		while(!_canPlay)
+		{
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}		
+			if(_socket.isClosed())
+			{
+				return;
+			}
+		}
+		
+		_saida.println("Start");
+		System.out.println("Digite uma msg: ");
+		String msg = _teclado.nextLine();
+		if(msg.compareTo("End")!=0 && _canPlay) 
+		{
+			_saida.println(msg);
+			_saida.print("FimTurno");
+			_canPlay = false;
+			Turn();
+		}
+		else if(msg.compareTo("End")==0)
+		{
+			_canPlay = false;
+			End();	
+		}
 	}
 	
 	void End()

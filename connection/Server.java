@@ -60,17 +60,45 @@ public class Server
 		{
 			_game.EndGame();
 		}
+		
+		public void EndTurn()
+		{
+			_game.SetNextPlayer();
+		}
 	}
 	
 	class Game implements Runnable
 	{
 		public int GameId;
 		private List<ServerThread> _players;
+		private Timer _timer;
+		private TimerTask _timerTask;
+		private boolean _canTimeout;
+		private boolean _gameRunning;
+		private boolean _nextPlayer;
+		private ServerThread _currentPlayer;
+		private int _currentPlayerIndex;
 		
 		Game(int id, List<ServerThread> players)
 		{
 			_players = players;
 			GameId = id;
+			_canTimeout = true;
+			_gameRunning = true;
+			_nextPlayer = false;
+			_currentPlayerIndex = -1;
+		}
+		
+		void GetNextPlayer()
+		{
+			_currentPlayerIndex = (_currentPlayerIndex + 1)%_players.size();
+			_currentPlayer = _players.get(_currentPlayerIndex);
+		}
+		
+		void SetNextPlayer()
+		{
+			System.out.println("Next Player");
+			_nextPlayer = true;
 		}
 		
 		public void run() 
@@ -84,15 +112,53 @@ public class Server
 			
 			System.out.println("Game " + GameId + " started");
 			
-			/*while(true)
+			while(_gameRunning)
 			{
+				GetNextPlayer();
 				
-			}*/
+				_timer = new Timer();
+				_timerTask = new TimerTask() {
+					  @Override
+					  public void run() {
+						  if(_canTimeout)
+						  {
+							  EndGame();
+							  System.out.println("Timeout terminando jogo");
+							  _canTimeout = false;  
+						  }
+					  }
+				};
+				_timer.schedule(_timerTask, 60*1000);
+				
+				_currentPlayer.GetPrintStream().println("Turno");
+				while(!_nextPlayer)
+				{
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+				_canTimeout = false;
+				_timerTask.cancel();
+				_timer.cancel();
+			}
 			
 		}
 		
 		public void RemovePlayer(ServerThread pl)
 		{
+			System.out.println("Removendo player " + _players.indexOf(pl));
+			if(_players.indexOf(pl) <= _currentPlayerIndex)
+			{
+				_currentPlayerIndex--;
+				if(_currentPlayerIndex < 0)
+				{
+					_currentPlayerIndex = _players.size()-1;
+				}
+			}
 			_players.remove(pl);
 			if(_players.size() == 1)
 			{
@@ -103,6 +169,7 @@ public class Server
 		public void EndGame()
 		{
 			System.out.println("EndGame");
+			_gameRunning = false;
 			for(ServerThread st : _players)
 			{
 				st.GetPrintStream().println("Desconectar");
@@ -118,6 +185,8 @@ public class Server
 		private boolean _ready;
 		private Room _room;
 		private boolean _canTimeout;
+		private Timer _timer;
+		private TimerTask _timerTask;
 		
 		public ServerThread(Socket cli, PrintStream p)
 		{
@@ -160,8 +229,8 @@ public class Server
 					_room = _rooms.get(_rooms.size()-1);
 				}
 				
-				Timer timer = new Timer();
-				timer.schedule(new TimerTask() {
+				_timer = new Timer();
+				_timerTask = new TimerTask() {
 					  @Override
 					  public void run() {
 						  if(_canTimeout)
@@ -171,7 +240,8 @@ public class Server
 							  _canTimeout = false;  
 						  }
 					  }
-				}, 2*60*1000);
+				};
+				_timer.schedule(_timerTask, 2*60*1000);
 								
 				while (in.hasNextLine()) 
 				{
@@ -181,13 +251,15 @@ public class Server
 						distribuiMensagem("Desconectando...", _nickname, _room.GetServerThreads());
 						_room.RemovePlayer(this);
 					}
-					else if(Pattern.matches(msg, "Jogada"))
+					else if(Pattern.matches(msg, "FimTurno"))
 					{
-						
+						_room.EndTurn();
 					} 
 					else if(Pattern.matches(msg, "Start"))
 					{
 						_canTimeout = false;
+						_timerTask.cancel();
+						_timer.cancel();
 					} 
 					else if(Pattern.matches(msg, "Finished"))
 					{
