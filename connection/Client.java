@@ -40,6 +40,12 @@ public class Client
 					int gameId = Integer.parseInt(msg.substring(13));
 					System.out.println("Começando partida na sala " + gameId);
 					_canPlay = true;
+				} 
+				else if(Pattern.matches(msg, "Desconectar"))
+				{
+					_canPlay = false;
+					End();
+					break;
 				}
 				else
 				{
@@ -117,12 +123,17 @@ public class Client
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}		
+			if(_socket.isClosed())
+			{
+				return;
 			}
 		}
-			
+
+		_saida.println("Start");
 		System.out.println("Digite uma msg: ");
 		String msg = _teclado.nextLine();
-		while(msg.compareTo("###")!=0) 
+		while(msg.compareTo("###")!=0 && _canPlay) 
 		{
 			_saida.println(msg);
 			msg = _teclado.nextLine();
@@ -133,6 +144,10 @@ public class Client
 	
 	void End()
 	{		
+		if(_socket.isClosed())
+		{
+			return;
+		}
 		_saida.println("Desconectar");
 		_saida.close();
 		_teclado.close();

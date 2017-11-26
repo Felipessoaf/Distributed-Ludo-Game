@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Pattern;
 
 public class Server
@@ -34,11 +36,6 @@ public class Server
 			if(_players.size() == 4)
 			{
 				//start game
-				/*for(ServerThread client : _players) 
-				{
-					String str = "Room: " + RoomId;
-					client.GetPrintStream().println(str);
-				}*/
 				_game = new Game(RoomId, _players);
 				new Thread(_game).start();
 			}
@@ -53,7 +50,10 @@ public class Server
 		public void RemovePlayer(ServerThread pl)
 		{
 			_players.remove(pl);
-			_game.RemovePlayer(pl);
+			if(_game != null)
+			{
+				_game.RemovePlayer(pl);
+			}
 		}
 	}
 	
@@ -100,12 +100,14 @@ public class Server
 		private String _nickname;
 		private boolean _ready;
 		private Room _room;
+		private boolean _canTimeout;
 		
 		public ServerThread(Socket cli, PrintStream p)
 		{
 			_cliente = cli;
 			_ps = p;
 			_ready = false;
+			_canTimeout = true;
 		}
 		
 		public void run()
@@ -141,6 +143,19 @@ public class Server
 					_room = _rooms.get(_rooms.size()-1);
 				}
 				
+				Timer timer = new Timer();
+				timer.schedule(new TimerTask() {
+					  @Override
+					  public void run() {
+						  if(_canTimeout)
+						  {
+							  _ps.println("Desconectar");
+							  System.out.println("Desconectando");
+							  _canTimeout = false;  
+						  }
+					  }
+				}, 10000);//2*60*1000);
+								
 				while (in.hasNextLine()) 
 				{
 					String msg = in.nextLine();
@@ -152,6 +167,11 @@ public class Server
 					else if(Pattern.matches(msg, "Jogada"))
 					{
 						
+					} 
+					else if(Pattern.matches(msg, "Start"))
+					{
+						_canTimeout = false;
+						System.out.println("Timeout false");
 					} 
 					else
 					{
