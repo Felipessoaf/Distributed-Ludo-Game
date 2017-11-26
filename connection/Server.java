@@ -55,6 +55,11 @@ public class Server
 				_game.RemovePlayer(pl);
 			}
 		}
+		
+		public void EndGame()
+		{
+			_game.EndGame();
+		}
 	}
 	
 	class Game implements Runnable
@@ -187,6 +192,10 @@ public class Server
 					else if(Pattern.matches(msg, "Finished"))
 					{
 						  _ps.println("Desconectar");
+					} 
+					else if(Pattern.matches(msg, "CloseWindow"))
+					{
+						  _room.EndGame();
 					} 
 					else
 					{

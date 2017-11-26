@@ -1,6 +1,5 @@
 regex
 acabar partida se timeout 1 min de um jogador
-acabar partida se receber msg de fechar janela do cliente
 implementar turnos
 
 
