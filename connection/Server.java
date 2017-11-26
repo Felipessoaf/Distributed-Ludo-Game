@@ -89,8 +89,20 @@ public class Server
 		public void RemovePlayer(ServerThread pl)
 		{
 			_players.remove(pl);
+			if(_players.size() == 1)
+			{
+				EndGame();
+			}
 		}
 		
+		public void EndGame()
+		{
+			System.out.println("EndGame");
+			for(ServerThread st : _players)
+			{
+				st.GetPrintStream().println("Desconectar");
+			}
+		}
 	}
 	
 	class ServerThread implements Runnable
@@ -154,7 +166,7 @@ public class Server
 							  _canTimeout = false;  
 						  }
 					  }
-				}, 10000);//2*60*1000);
+				}, 2*60*1000);
 								
 				while (in.hasNextLine()) 
 				{
@@ -171,7 +183,6 @@ public class Server
 					else if(Pattern.matches(msg, "Start"))
 					{
 						_canTimeout = false;
-						System.out.println("Timeout false");
 					} 
 					else if(Pattern.matches(msg, "Finished"))
 					{

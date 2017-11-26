@@ -1,6 +1,8 @@
 regex
-acabar partida se tiver só 1 jogador
 acabar partida se timeout 1 min de um jogador
 acabar partida se receber msg de fechar janela do cliente
-desconectar clientes quando acabar partida
+implementar turnos
 
+
+bug:
+-ultimo player espera input pra terminar

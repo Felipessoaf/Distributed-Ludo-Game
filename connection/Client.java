@@ -148,9 +148,20 @@ public class Client
 		{
 			return;
 		}
+		
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		_saida.println("Desconectar");
+		System.out.println("end after _saida");
 		_saida.close();
+		System.out.println("end after _saida close");
 		_teclado.close();
+		System.out.println("end after _teclado close");
 		try {
 			_socket.close();
 		} catch (IOException e) {
