@@ -129,7 +129,7 @@ public class Server
 						  }
 					  }
 				};
-				//_timer.schedule(_timerTask, 60*1000);
+				_timer.schedule(_timerTask, 60*1000);
 				
 				_currentPlayer.GetPrintStream().println("Turno");
 				while(!_nextPlayer)
@@ -153,9 +153,10 @@ public class Server
 		public void RemovePlayer(ServerThread pl)
 		{
 			int index = _players.indexOf(pl);
-			System.out.println("Removendo player " + index);
+			System.out.println("Tentando remover player " + index);
 			if(index >= 0)
 			{
+				System.out.println("Removendo player " + index);
 				if(index <= _currentPlayerIndex)
 				{
 					_currentPlayerIndex--;
