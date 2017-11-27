@@ -7,6 +7,8 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import interfacejogo.*;
+
 public class Client
 {
 	class ClientThread implements Runnable
@@ -109,6 +111,8 @@ public class Client
 		}
 		
 		_canPlay = false;
+		
+		new BoardFrame();
 	}
 	
 	void Nickname()
