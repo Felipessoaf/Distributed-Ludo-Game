@@ -65,12 +65,12 @@ public class ButtonsPanel extends JPanel implements ObservadorIF {
 	
 	private void SetButtons(){
 		int i=0;
-		for(JButton jb : new JButton []{ novoJogo/*, carregar, salvar*/}){
-			jb.setSize(4*ponto, ponto);
-			jb.setLocation(x0+ponto/2, i+ponto);
-			this.add(jb);
-			i+=3*ponto/2;
-		}		
+//		for(JButton jb : new JButton []{ novoJogo, carregar, salvar}){
+//			jb.setSize(4*ponto, ponto);
+//			jb.setLocation(x0+ponto/2, i+ponto);
+//			this.add(jb);
+//			i+=3*ponto/2;
+//		}		
 		lancarDado.setSize(4*ponto, ponto);
 		lancarDado.setLocation(x0+ponto/2, 19*ponto/2);
 		this.add(lancarDado);
@@ -131,7 +131,7 @@ public class ButtonsPanel extends JPanel implements ObservadorIF {
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				jogof.StartGame();
+				//jogof.StartGame();
 				salvar.setEnabled(true);
 				revalidate();
 				repaint();

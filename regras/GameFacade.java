@@ -6,6 +6,7 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
+import connection.Client.ClientThread;
 import interfaces.*;
 
 public class GameFacade implements ObservadoIF, ObservadorIF{
@@ -44,9 +45,9 @@ public class GameFacade implements ObservadoIF, ObservadorIF{
 		li.next().notify(this);
 	}
 	
-	public void StartGame(){
+	public void StartGame(int num, ClientThread player){
 		SetLancarDadoEnabled(true);
-		jogo.StartGame();
+		jogo.StartGame(num, player);
 	}
 	
 	public void RollDice(){
@@ -146,5 +147,25 @@ public class GameFacade implements ObservadoIF, ObservadorIF{
 		ListIterator<ObservadorIF> li = lst.listIterator();
 		while(li.hasNext())
 			li.next().notify(this);
+	}
+	
+	public void UpdateBoardIn(String board)
+	{
+		int [][][] allpieces = new int [4][4][2];
+		String[] individualPieces = board.split("");
+		int p = 0;
+		
+		for(int i = 0; i< allpieces.length;i++)
+		{
+			for(int j = 0; j< allpieces[i].length;j++)
+			{
+				for(int k =0; k < allpieces[i][j].length;k++)
+				{
+					allpieces[i][j][k] = Integer.parseInt(individualPieces[p]);
+					p++;
+				}	
+			}
+		}
+		pieces.SetAll(allpieces);
 	}
 }

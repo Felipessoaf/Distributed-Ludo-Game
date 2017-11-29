@@ -8,10 +8,11 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import interfacejogo.*;
+import regras.GameFacade;
 
 public class Client
 {
-	class ClientThread implements Runnable
+	public class ClientThread implements Runnable
 	{
 		public ClientThread()
 		{
@@ -37,11 +38,13 @@ public class Client
 				{
 					Nickname();
 				} 
-//				else if(Pattern.matches(msg, "Start. Room: 0"))
-//				{
-//					int gameId = Integer.parseInt(msg.substring(13));
-//					System.out.println("Começando partida na sala " + gameId);
-//				} 
+				else if(Pattern.matches(msg, "Start \\d"))
+				{
+					//TODO: pegar o numero do player
+					int num = 0;
+					System.out.println("Começou o jogo");
+					GameFacade.GetJogoFacade().StartGame(num, this);
+				} 
 				else if(Pattern.matches(msg, "Turno"))
 				{
 					System.out.println("meu turno");
@@ -53,6 +56,13 @@ public class Client
 					End();
 					break;
 				}
+				else if(Pattern.matches(msg, "Board (\\w+)"))
+				{
+					//TODO: pegar string board
+					String board = "";
+					GameFacade.GetJogoFacade().UpdateBoardIn(board);
+					break;
+				}
 				else
 				{
 					System.out.println(msg);
@@ -60,6 +70,11 @@ public class Client
 			}
 			
 			in_serv.close();
+		}
+		
+		public void UpdateBoardOut(String board)
+		{
+			_saida.println("Board" + board);
 		}
 	}
 	

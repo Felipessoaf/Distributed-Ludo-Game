@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 
+import connection.Client.ClientThread;
 import interfacejogo.Main;
 import interfaces.ObservadoIF;
 import interfaces.ObservadorIF;
@@ -16,6 +17,8 @@ public class Game implements ObservadoIF{
 	private Pieces piecesclass;
 	private GetByColor getByColor;
 	private List<ObservadorIF> lst = new ArrayList<ObservadorIF>();
+	private ClientThread player;
+	private int playerId;
 	
 	private int currentPlayer;
 	int GetCurrentPlayer(){return currentPlayer;}
@@ -78,11 +81,13 @@ public class Game implements ObservadoIF{
 		SetCurrentState(6);
 	}
 	
-	void StartGame(){
+	void StartGame(int num, ClientThread pl){
 		StartGamePieces();
 		SetCurrentPlayer(0);
 		SetCurrentState(0);
 		SetDiceValue(-1);
+		player = pl;
+		playerId = num;
 	}
 	
 	void RollDice(){
@@ -154,6 +159,20 @@ public class Game implements ObservadoIF{
 			SetCurrentPlayer(GetCurrentPlayer() < 3 ? GetCurrentPlayer()+1 : 0);
 			roundsPlayed =0;
 		}
+		
+		StringBuilder board = new StringBuilder();
+		Pieces piecesInstance = Pieces.GetPieces();
+		for(int [][] allpieces : piecesInstance.GetAll())
+		{
+			for(int [] pieces : allpieces)
+			{
+				for(int piece : pieces)
+				{
+					board.append(piece);	
+				}	
+			}
+		}
+		player.UpdateBoardOut(board.toString());
 		SetDiceValue(0);
 		SetCurrentState(0);
 		GameFacade.GetJogoFacade().SetLancarDadoEnabled(true);

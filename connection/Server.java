@@ -104,11 +104,13 @@ public class Server
 		
 		public void run() 
 		{
+			int i = 0;
 			//start game
 			for(ServerThread client : _players) 
 			{
-				String str = "Start. Room: " + GameId;
+				String str = "Start " + i;
 				client.GetPrintStream().println(str);
+				i++;
 			}
 			
 			System.out.println("Game " + GameId + " started");
@@ -288,7 +290,7 @@ public class Server
 						_lock.get(_roomId).lock();
 						try
 						{
-							distribuiMensagem("Desconectando...", _nickname, _room.GetServerThreads());
+							distribuiMensagem("Desconectando...", _nickname, _room.GetServerThreads(), true);
 							
 							try {
 								Thread.sleep(500);
@@ -316,16 +318,20 @@ public class Server
 					} 
 					else if(Pattern.matches(msg, "Finished"))
 					{
-						  _ps.println("Desconectar");
+						_ps.println("Desconectar");
 					} 
 					else if(Pattern.matches(msg, "CloseWindow"))
 					{
-						  _room.EndGame();
+						_room.EndGame();
 					} 
+					else if(Pattern.matches(msg, "Board (\\w+)"))
+					{
+						distribuiMensagem(msg, _nickname, _room.GetServerThreads(), false);
+					}
 					else
 					{
 						System.out.println(_nickname + ": " + msg);
-						distribuiMensagem(msg, _nickname, _room.GetServerThreads());
+						distribuiMensagem(msg, _nickname, _room.GetServerThreads(), true);
 					}
 				}
 			//}
@@ -411,13 +417,21 @@ public class Server
 		System.out.println("O servidor terminou de executar!");
 	}
 	
-	void distribuiMensagem(String msg, String nick, List<ServerThread> st) 
+	void distribuiMensagem(String msg, String nick, List<ServerThread> st, boolean useNick) 
 	{
 		for(ServerThread client : st) 
 		{
 			if(client.GetNickname() != nick)
 			{
-				String str = nick + ": " + msg;
+				String str = null;
+				if(useNick)
+				{
+					str = nick + ": " + msg;
+				}
+				else
+				{
+					str = msg;
+				}
 				client.GetPrintStream().println(str);
 			}
 		}
