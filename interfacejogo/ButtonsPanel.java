@@ -131,7 +131,7 @@ public class ButtonsPanel extends JPanel implements ObservadorIF {
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				//jogof.StartGame();
+				jogof.StartGame(0,null);
 				salvar.setEnabled(true);
 				revalidate();
 				repaint();

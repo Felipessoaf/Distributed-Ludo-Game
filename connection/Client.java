@@ -38,10 +38,9 @@ public class Client
 				{
 					Nickname();
 				} 
-				else if(Pattern.matches(msg, "Start \\d"))
+				else if(msg.matches("Start \\d"))//Pattern.matches(msg, "Start \\d"))
 				{
-					//TODO: pegar o numero do player
-					int num = 0;
+					int num = Integer.parseInt(msg.split(" ")[1]);
 					System.out.println("Começou o jogo");
 					GameFacade.GetJogoFacade().StartGame(num, this);
 				} 
@@ -56,16 +55,17 @@ public class Client
 					End();
 					break;
 				}
-				else if(Pattern.matches(msg, "Board (\\w+)"))
+				else if((msg.matches("Board (\\d)+")) || (msg.matches("Board (\\d+)")) || (msg.matches("Board \\d+")))//Pattern.matches(msg, "Board (\\w+)"))
 				{
 					//TODO: pegar string board
-					String board = "";
+					System.out.println("board reconheceu");
+					String board = msg.split(" ")[1];
 					GameFacade.GetJogoFacade().UpdateBoardIn(board);
 					break;
 				}
 				else
 				{
-					System.out.println(msg);
+					System.out.println(msg + "lenght: " + msg.length());
 				}
 			}
 			
@@ -74,7 +74,7 @@ public class Client
 		
 		public void UpdateBoardOut(String board)
 		{
-			_saida.println("Board" + board);
+			_saida.println("Board " + board);
 		}
 	}
 	

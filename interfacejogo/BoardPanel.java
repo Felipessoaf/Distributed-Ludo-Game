@@ -189,7 +189,12 @@ public class BoardPanel extends JPanel implements ObservadorIF {
 			g2d.setStroke(new BasicStroke(2));
 			for(int[][] pieces : this.pieces/*new int[][][] {jogof.GetRedPieces(), jogof.GetBluePieces(), jogof.GetGreenPieces(), jogof.GetYellowPieces()}*/){
 				for(int piece = 0; piece<4;piece++)
-					DrawPiece(g2d, countColor, pieces, piece);
+				{
+					if(pieces != null)
+					{
+						DrawPiece(g2d, countColor, pieces, piece);	
+					}	
+				}
 				countColor++;
 			}	
 		}
@@ -197,6 +202,7 @@ public class BoardPanel extends JPanel implements ObservadorIF {
 
 	private void DrawPiece(Graphics2D g2d, int count, int[][] pieces, int piece) {
 		SetPiecesPaint(g2d, count);
+
 		Ellipse2D ec = new Ellipse2D.Double(pieces[piece][0]*p,pieces[piece][1]*p, p,p);
 		FillAndDrawBlackLine(g2d,ec);
 		SetPaint(g2d, count);
