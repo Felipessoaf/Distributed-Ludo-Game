@@ -152,7 +152,7 @@ public class GameFacade implements ObservadoIF, ObservadorIF{
 	public void UpdateBoardIn(String board)
 	{
 		int [][][] allpieces = new int [4][4][2];
-		String[] individualPieces = board.split("");
+		String[] individualPieces = board.split(",");
 		int p = 0;
 		
 		for(int i = 0; i< allpieces.length;i++)

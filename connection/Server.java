@@ -324,8 +324,9 @@ public class Server
 					{
 						_room.EndGame();
 					} 
-					else if((msg.matches("Board (\\d)+")) || (msg.matches("Board (\\d+)")) || (msg.matches("Board \\d+")))//Pattern.matches(msg, "Board (\\w+)"))
+					else if((msg.matches("Board ((\\d)+,)+")) || (msg.matches("Board ((\\d+),)+")) || (msg.matches("Board (\\d+,)+")))//Pattern.matches(msg, "Board (\\w+)"))
 					{
+						System.out.println("server board");
 						distribuiMensagem(msg, _nickname, _room.GetServerThreads(), false);
 					}
 					else

@@ -160,6 +160,7 @@ public class Game implements ObservadoIF{
 			roundsPlayed =0;
 		}
 		
+		int count = 0;
 		StringBuilder board = new StringBuilder();
 		Pieces piecesInstance = Pieces.GetPieces();
 		for(int [][] allpieces : piecesInstance.GetAll())
@@ -168,11 +169,17 @@ public class Game implements ObservadoIF{
 			{
 				for(int piece : pieces)
 				{
-					board.append(piece);	
+					System.out.println(count + ": " + piece);
+					board.append(piece);
+					board.append(",");
+					count++;
 				}	
 			}
 		}
-		player.UpdateBoardOut(board.toString());
+		if(player != null)
+		{
+			player.UpdateBoardOut(board.toString());	
+		}
 		SetDiceValue(0);
 		SetCurrentState(0);
 		GameFacade.GetJogoFacade().SetLancarDadoEnabled(true);

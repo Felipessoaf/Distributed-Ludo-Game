@@ -55,11 +55,13 @@ public class Client
 					End();
 					break;
 				}
-				else if((msg.matches("Board (\\d)+")) || (msg.matches("Board (\\d+)")) || (msg.matches("Board \\d+")))//Pattern.matches(msg, "Board (\\w+)"))
+				else if((msg.matches("Board ((\\d)+,)+")) || (msg.matches("Board ((\\d+),)+")) || (msg.matches("Board (\\d+,)+")))//Pattern.matches(msg, "Board (\\w+)"))
 				{
 					//TODO: pegar string board
-					System.out.println("board reconheceu");
+					System.out.println("client board");
+					System.out.println(msg + "lenght: " + msg.length());
 					String board = msg.split(" ")[1];
+					System.out.println("board: " + board + "lenght: " + board.length());
 					GameFacade.GetJogoFacade().UpdateBoardIn(board);
 					break;
 				}
