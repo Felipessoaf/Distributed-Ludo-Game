@@ -46,7 +46,10 @@ public class GameFacade implements ObservadoIF, ObservadorIF{
 	}
 	
 	public void StartGame(int num, ClientThread player){
-		SetLancarDadoEnabled(true);
+		if(num == jogo.GetCurrentPlayer())
+		{
+			SetLancarDadoEnabled(true);	
+		}
 		jogo.StartGame(num, player);
 	}
 	
@@ -167,5 +170,6 @@ public class GameFacade implements ObservadoIF, ObservadorIF{
 			}
 		}
 		pieces.SetAll(allpieces);
+		Game.GetJogo().NextPlayer(false);
 	}
 }

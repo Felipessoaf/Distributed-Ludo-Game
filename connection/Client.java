@@ -8,6 +8,7 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import interfacejogo.*;
+import regras.Game;
 import regras.GameFacade;
 
 public class Client
@@ -30,10 +31,12 @@ public class Client
 				e.printStackTrace();
 				return;
 			}
-			
+
+//			System.out.println("Esperando msg do server");
 			while (in_serv.hasNextLine()) 
 			{
 				msg = in_serv.nextLine();
+//				System.out.println("Peguei msg do server");
 				if(Pattern.matches(msg, "Informe um nickname: "))
 				{
 					Nickname();
@@ -46,7 +49,7 @@ public class Client
 				} 
 				else if(Pattern.matches(msg, "Turno"))
 				{
-					System.out.println("meu turno");
+//					System.out.println("meu turno");
 					_canPlay = true;
 				} 
 				else if(Pattern.matches(msg, "Desconectar"))
@@ -58,17 +61,16 @@ public class Client
 				else if((msg.matches("Board ((\\d)+,)+")) || (msg.matches("Board ((\\d+),)+")) || (msg.matches("Board (\\d+,)+")))//Pattern.matches(msg, "Board (\\w+)"))
 				{
 					//TODO: pegar string board
-					System.out.println("client board");
-					System.out.println(msg + "lenght: " + msg.length());
+//					System.out.println("client board");
 					String board = msg.split(" ")[1];
-					System.out.println("board: " + board + "lenght: " + board.length());
 					GameFacade.GetJogoFacade().UpdateBoardIn(board);
 					break;
 				}
 				else
 				{
-					System.out.println(msg + "lenght: " + msg.length());
+					System.out.println("Default: " + msg + "lenght: " + msg.length());
 				}
+//				System.out.println("Esperando msg do server");
 			}
 			
 			in_serv.close();
@@ -76,7 +78,10 @@ public class Client
 		
 		public void UpdateBoardOut(String board)
 		{
+			System.out.println("Update Board Out");
+			System.out.println("Updated Board " + board);
 			_saida.println("Board " + board);
+//			_saida.println("FimTurno");
 		}
 	}
 	
@@ -93,6 +98,7 @@ public class Client
 	public Client()
 	{
 		Init();
+//		_saida.println("Start");
 		Turn();
 	}
 	
@@ -184,21 +190,21 @@ public class Client
 		}
 		
 		_saida.println("Start");
-		System.out.println("Digite uma msg: ");
-		String msg = _teclado.nextLine();
-		if(msg.compareTo("End")!=0 && _canPlay) 
+//		System.out.println("Digite uma msg: ");
+//		String msg = _teclado.nextLine();
+//		if(msg.compareTo("End")!=0 && _canPlay) 
 		{
-			_saida.println(msg);
+//			_saida.println(msg);
 			_saida.println("FimTurno");
-			System.out.println("mandei fimturno pro server");
+//			System.out.println("mandei fimturno pro server");
 			_canPlay = false;
 			Turn();
 		}
-		else if(msg.compareTo("End")==0)
-		{
-			_canPlay = false;
-			End();	
-		}
+//		else if(msg.compareTo("End")==0)
+//		{
+//			_canPlay = false;
+//			End();	
+//		}
 	}
 	
 	void End()
@@ -216,9 +222,9 @@ public class Client
 		}
 		
 		_saida.println("Desconectar");
-		System.out.println("end after _saida");
+//		System.out.println("end after _saida");
 		_saida.close();
-		System.out.println("end after _saida close");
+//		System.out.println("end after _saida close");
 
 		try
 		{

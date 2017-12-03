@@ -98,7 +98,7 @@ public class Server
 		
 		void SetNextPlayer()
 		{
-			System.out.println("Next Player");
+			System.out.println("Set Next Player");
 			_nextPlayer = true;
 		}
 		
@@ -281,10 +281,12 @@ public class Server
 					  }
 				};
 				_timer.schedule(_timerTask, 2*60*1000);
-								
+							
+				System.out.println("Esperando msg do cliente");
 				while (in.hasNextLine()) 
 				{
 					String msg = in.nextLine();
+					System.out.println("Peguei msg do cliente");
 					if(Pattern.matches(msg, "Desconectar"))
 					{
 						_lock.get(_roomId).lock();
@@ -334,6 +336,7 @@ public class Server
 						System.out.println(_nickname + ": " + msg);
 						distribuiMensagem(msg, _nickname, _room.GetServerThreads(), true);
 					}
+					System.out.println("Esperando msg do cliente");
 				}
 			//}
 			
@@ -433,6 +436,7 @@ public class Server
 				{
 					str = msg;
 				}
+				System.out.println("Distribuindo msg: " + msg);
 				client.GetPrintStream().println(str);
 			}
 		}

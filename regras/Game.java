@@ -111,7 +111,7 @@ public class Game implements ObservadoIF{
 				if(moved){
 					SetWaitingForPlayer(changeCurrentStateTo != 5 ? false : true);
 					if(!IsWaitingForPlayer() )
-						NextPlayer();
+						NextPlayer(true);
 					else
 						MovePiece();
 					return;
@@ -146,7 +146,7 @@ public class Game implements ObservadoIF{
 		return false;
 	}
 	
-	private void NextPlayer(){
+	public void NextPlayer(boolean UpdateBoard){
 		try {
 			Thread.sleep(800);
 		} catch (InterruptedException e) {
@@ -159,6 +159,7 @@ public class Game implements ObservadoIF{
 			SetCurrentPlayer(GetCurrentPlayer() < 3 ? GetCurrentPlayer()+1 : 0);
 			roundsPlayed =0;
 		}
+		System.out.println("NextPlayer()");
 		
 		int count = 0;
 		StringBuilder board = new StringBuilder();
@@ -169,20 +170,22 @@ public class Game implements ObservadoIF{
 			{
 				for(int piece : pieces)
 				{
-					System.out.println(count + ": " + piece);
 					board.append(piece);
 					board.append(",");
 					count++;
 				}	
 			}
 		}
-		if(player != null)
+		if(player != null && UpdateBoard)
 		{
 			player.UpdateBoardOut(board.toString());	
 		}
 		SetDiceValue(0);
 		SetCurrentState(0);
-		GameFacade.GetJogoFacade().SetLancarDadoEnabled(true);
+		if(playerId == GetCurrentPlayer())
+		{
+			GameFacade.GetJogoFacade().SetLancarDadoEnabled(true);	
+		}
 	}
 		
 	private int[] PieceSelected(MouseEvent e){
@@ -319,19 +322,19 @@ public class Game implements ObservadoIF{
 		int lastmoved = getByColor.GetLastPieceMovedByColor(color);
 		if(lastmoved <100)
 			this.MovePieceFromCurrentToNew(color, lastmoved, -1);
-		NextPlayer();
+		NextPlayer(true);
 	}
 	
 	private void ChooseMovementAndMovePiece(String color) {
 		if(CanMoveAutomatically(color)){
 			MovePieceFromStartPlaceToStartHouse(color);
-			NextPlayer();
+			NextPlayer(true);
 		}
 		else if(CanMove(color))
 			WaitForPlayerMovement(color);
 		else{
 			PlayerCantMove();
-			NextPlayer();
+			NextPlayer(true);
 		}
 	}
 	
