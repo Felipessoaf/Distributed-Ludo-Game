@@ -1,5 +1,7 @@
 package connection;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
@@ -8,16 +10,15 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import interfacejogo.*;
-import regras.Game;
 import regras.GameFacade;
 
 public class Client
 {
-	public class ClientThread implements Runnable
+	public class ClientThread implements Runnable, WindowListener
 	{
 		public ClientThread()
 		{
-			
+			_boardFrame.addWindowListener(this);
 		}
 		
 		public void run()
@@ -32,11 +33,11 @@ public class Client
 				return;
 			}
 
-//			System.out.println("Esperando msg do server");
+			System.out.println("Esperando msg do server");
 			while (in_serv.hasNextLine()) 
 			{
 				msg = in_serv.nextLine();
-//				System.out.println("Peguei msg do server");
+				System.out.println("Peguei msg do server");
 				if(Pattern.matches(msg, "Informe um nickname: "))
 				{
 					Nickname();
@@ -46,10 +47,12 @@ public class Client
 					int num = Integer.parseInt(msg.split(" ")[1]);
 					System.out.println("Começou o jogo");
 					GameFacade.GetJogoFacade().StartGame(num, this);
+					_saida.println("Start");
 				} 
 				else if(Pattern.matches(msg, "Turno"))
 				{
-//					System.out.println("meu turno");
+					System.out.println("meu turno");
+					GameFacade.GetJogoFacade().SetLancarDadoEnabled(true);
 					_canPlay = true;
 				} 
 				else if(Pattern.matches(msg, "Desconectar"))
@@ -61,16 +64,15 @@ public class Client
 				else if((msg.matches("Board ((\\d)+,)+")) || (msg.matches("Board ((\\d+),)+")) || (msg.matches("Board (\\d+,)+")))//Pattern.matches(msg, "Board (\\w+)"))
 				{
 					//TODO: pegar string board
-//					System.out.println("client board");
+					System.out.println("client board");
 					String board = msg.split(" ")[1];
 					GameFacade.GetJogoFacade().UpdateBoardIn(board);
-					break;
 				}
 				else
 				{
 					System.out.println("Default: " + msg + "lenght: " + msg.length());
 				}
-//				System.out.println("Esperando msg do server");
+				System.out.println("Esperando msg do server");
 			}
 			
 			in_serv.close();
@@ -80,8 +82,50 @@ public class Client
 		{
 			System.out.println("Update Board Out");
 			System.out.println("Updated Board " + board);
+			_saida.println("FimTurno");
 			_saida.println("Board " + board);
-//			_saida.println("FimTurno");
+		}
+
+		@Override
+		public void windowActivated(WindowEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void windowClosed(WindowEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void windowClosing(WindowEvent e) 
+		{
+			_saida.println("CloseWindow");
+		}
+
+		@Override
+		public void windowDeactivated(WindowEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void windowDeiconified(WindowEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void windowIconified(WindowEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void windowOpened(WindowEvent e) {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 	
@@ -93,13 +137,14 @@ public class Client
 	
 	private boolean _canPlay;
 	
+	private BoardFrame _boardFrame;
+	
 	public PrintStream ps;
 	
 	public Client()
 	{
 		Init();
-//		_saida.println("Start");
-		Turn();
+//		Turn();
 	}
 	
 	public static void main(String[] args) throws UnknownHostException, IOException 
@@ -122,8 +167,6 @@ public class Client
 		
 		ps = new PrintStream(System.out);
 		
-		new Thread(new ClientThread()).start();
-		
 		_teclado = new Scanner(System.in);
 		_saida = null;
 		try {
@@ -135,7 +178,8 @@ public class Client
 		
 		_canPlay = false;
 		
-		new BoardFrame();
+		_boardFrame = new BoardFrame();
+		new Thread(new ClientThread()).start();
 	}
 	
 	void Nickname()
@@ -243,5 +287,6 @@ public class Client
 			e.printStackTrace();
 		}
 		System.out.println("O cliente terminou de executar!");
+		_boardFrame.dispatchEvent(new WindowEvent(_boardFrame, WindowEvent.WINDOW_CLOSING));
 	}
 }

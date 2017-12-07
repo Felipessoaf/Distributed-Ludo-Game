@@ -132,7 +132,8 @@ public class Server
 					  }
 				};
 				_timer.schedule(_timerTask, 60*1000);
-				
+
+				System.out.println("Current Player: " + _currentPlayerIndex);	
 				_currentPlayer.GetPrintStream().println("Turno");
 				while(!_nextPlayer)
 				{
@@ -339,6 +340,8 @@ public class Server
 					System.out.println("Esperando msg do cliente");
 				}
 			//}
+
+			System.out.println("Terminando serverthread");
 			
 			in.close();
 			

@@ -184,7 +184,7 @@ public class Game implements ObservadoIF{
 		SetCurrentState(0);
 		if(playerId == GetCurrentPlayer())
 		{
-			GameFacade.GetJogoFacade().SetLancarDadoEnabled(true);	
+//			GameFacade.GetJogoFacade().SetLancarDadoEnabled(true);	
 		}
 	}
 		
