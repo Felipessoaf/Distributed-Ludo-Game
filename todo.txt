@@ -2,6 +2,5 @@ bug:
 -indexof na remoçao
 
 new:
--botar tela pra nickname
 -engenharia reversa do diagrama de classe
 -diagrama de sequencia
