@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import connectionview.ClientView;
 import interfacejogo.*;
 import regras.GameFacade;
 
@@ -129,6 +130,8 @@ public class Client
 		}
 	}
 	
+	/////////////////////////////////////////////////////////////////////////////////////
+	
 	private Scanner _serverScanner;
 	private Socket _socket;
 	
@@ -141,15 +144,24 @@ public class Client
 	
 	public PrintStream ps;
 	
-	public Client()
+	private String _nickname;
+	
+	public Client(String nickname)
 	{
+		_nickname = nickname;
 		Init();
 //		Turn();
 	}
 	
 	public static void main(String[] args) throws UnknownHostException, IOException 
 	{
-		new Client();
+		ClientView nicknameView = new ClientView();
+		
+		while(nicknameView.getNickname().isEmpty());
+		
+		String nickname = nicknameView.getNickname();
+		nicknameView.exit();
+		new Client(nickname);
 	}
 	
 	void Init()
@@ -184,9 +196,9 @@ public class Client
 	
 	void Nickname()
 	{		
-		System.out.println("Informe um Nickname: ");
-		String msg = _teclado.nextLine();
-		_saida.println(msg);
+		//System.out.println("Informe um Nickname: ");
+		//String msg = _teclado.nextLine();
+		_saida.println(_nickname);
 	}
 	
 	void Play()
