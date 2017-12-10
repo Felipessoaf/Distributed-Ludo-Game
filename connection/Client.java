@@ -16,10 +16,9 @@ import regras.GameFacade;
 public class Client
 {
 	public class ClientThread implements Runnable, WindowListener
-	{
+	{			
 		public ClientThread()
 		{
-			_boardFrame.addWindowListener(this);
 		}
 		
 		public void run()
@@ -43,8 +42,12 @@ public class Client
 				{
 					Nickname();
 				} 
-				else if(msg.matches("Start \\d"))//Pattern.matches(msg, "Start \\d"))
+				else if(msg.matches("Start \\d"))
 				{
+					_boardFrame = new BoardFrame();
+
+					_boardFrame.addWindowListener(this);
+					
 					int num = Integer.parseInt(msg.split(" ")[1]);
 					System.out.println("Começou o jogo");
 					GameFacade.GetJogoFacade().StartGame(num, this);
@@ -143,25 +146,16 @@ public class Client
 	private BoardFrame _boardFrame;
 	
 	public PrintStream ps;
-	
-	private String _nickname;
-	
-	public Client(String nickname)
+			
+	public Client()
 	{
-		_nickname = nickname;
 		Init();
 //		Turn();
 	}
 	
 	public static void main(String[] args) throws UnknownHostException, IOException 
 	{
-		ClientView nicknameView = new ClientView();
-		
-		while(nicknameView.getNickname().isEmpty());
-		
-		String nickname = nicknameView.getNickname();
-		nicknameView.exit();
-		new Client(nickname);
+		new Client();
 	}
 	
 	void Init()
@@ -190,15 +184,18 @@ public class Client
 		
 		_canPlay = false;
 		
-		_boardFrame = new BoardFrame();
 		new Thread(new ClientThread()).start();
 	}
 	
 	void Nickname()
 	{		
-		//System.out.println("Informe um Nickname: ");
-		//String msg = _teclado.nextLine();
-		_saida.println(_nickname);
+		ClientView nicknameView = new ClientView();
+		
+		while(nicknameView.getNickname().isEmpty());
+		
+		String nickname = nicknameView.getNickname();
+		nicknameView.exit();
+		_saida.println(nickname);
 	}
 	
 	void Play()
