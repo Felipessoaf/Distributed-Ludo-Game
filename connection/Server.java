@@ -17,7 +17,7 @@ public class Server
 	{
 		public int RoomId;
 		private List<ServerThread> _players;
-		private Game _game;
+		private GameRunnable _game;
 		
 		public Room(int id)
 		{
@@ -37,7 +37,7 @@ public class Server
 			if(_players.size() == 4)
 			{
 				//start game
-				_game = new Game(RoomId, _players);
+				_game = new GameRunnable(RoomId, _players);
 				new Thread(_game).start();
 			}
 			return true;
@@ -71,7 +71,7 @@ public class Server
 		}
 	}
 	
-	class Game implements Runnable
+	class GameRunnable implements Runnable
 	{
 		public int GameId;
 		private List<ServerThread> _players;
@@ -83,7 +83,7 @@ public class Server
 		private ServerThread _currentPlayer;
 		private int _currentPlayerIndex;
 		
-		Game(int id, List<ServerThread> players)
+		GameRunnable(int id, List<ServerThread> players)
 		{
 			_players = players;
 			GameId = id;
