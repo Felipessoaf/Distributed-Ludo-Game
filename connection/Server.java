@@ -143,7 +143,6 @@ public class Server
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -195,7 +194,6 @@ public class Server
 		private Socket _cliente;
 		private PrintStream _ps;
 		private String _nickname;
-		private boolean _ready;
 		private Room _room;
 		private boolean _canTimeout;
 		private Timer _timer;
@@ -206,7 +204,6 @@ public class Server
 		{
 			_cliente = cli;
 			_ps = p;
-			_ready = false;
 			_canTimeout = true;
 		}
 		
@@ -219,7 +216,6 @@ public class Server
 		    }
 		    if (this == obj)
 		    {
-				System.out.println("equals");
                 return true;	
 		    }
 		    if (getClass() != obj.getClass()) 
@@ -232,7 +228,6 @@ public class Server
 		    {
 		        return false;
 		    }
-			System.out.println("equals");
 		    return true;
 		}
 		
@@ -242,7 +237,6 @@ public class Server
 			try {
 				in = new Scanner(_cliente.getInputStream());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -301,7 +295,6 @@ public class Server
 							try {
 								Thread.sleep(500);
 							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 							
@@ -330,7 +323,7 @@ public class Server
 					{
 						_room.EndGame();
 					} 
-					else if((msg.matches("Board ((\\d)+,)+")) || (msg.matches("Board ((\\d+),)+")) || (msg.matches("Board (\\d+,)+")))//Pattern.matches(msg, "Board (\\w+)"))
+					else if((msg.matches("Board ((\\d)+,)+")) || (msg.matches("Board ((\\d+),)+")) || (msg.matches("Board (\\d+,)+")))
 					{
 						System.out.println("server board");
 						distribuiMensagem(msg, _nickname, _room.GetServerThreads(), false);
@@ -351,7 +344,6 @@ public class Server
 			try {
 				_cliente.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -389,7 +381,6 @@ public class Server
 		try {
 			servidor = new ServerSocket(5000);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("Porta 5000 aberta!");
@@ -401,7 +392,6 @@ public class Server
 			try {
 				cliente = servidor.accept();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -411,7 +401,6 @@ public class Server
 			try {
 				st = new ServerThread(cliente, new PrintStream(cliente.getOutputStream()));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			_serverThreads.add(st);
@@ -421,7 +410,6 @@ public class Server
 		try {
 			servidor.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("O servidor terminou de executar!");

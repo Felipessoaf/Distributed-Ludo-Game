@@ -28,7 +28,6 @@ public class Client
 			try {
 				in_serv = new Scanner(_socket.getInputStream());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return;
 			}
@@ -65,9 +64,8 @@ public class Client
 					End();
 					break;
 				}
-				else if((msg.matches("Board ((\\d)+,)+")) || (msg.matches("Board ((\\d+),)+")) || (msg.matches("Board (\\d+,)+")))//Pattern.matches(msg, "Board (\\w+)"))
+				else if((msg.matches("Board ((\\d)+,)+")) || (msg.matches("Board ((\\d+),)+")) || (msg.matches("Board (\\d+,)+")))
 				{
-					//TODO: pegar string board
 					System.out.println("client board");
 					String board = msg.split(" ")[1];
 					GameFacade.GetJogoFacade().UpdateBoardIn(board);
@@ -135,7 +133,6 @@ public class Client
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	
-	private Scanner _serverScanner;
 	private Socket _socket;
 	
 	private Scanner _teclado;
@@ -150,7 +147,6 @@ public class Client
 	public Client()
 	{
 		Init();
-//		Turn();
 	}
 	
 	public static void main(String[] args) throws UnknownHostException, IOException 
@@ -164,10 +160,8 @@ public class Client
 			_socket = new Socket("127.0.0.1", 5000);
 			System.out.println("O cliente se conectou ao servidor!");
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -178,7 +172,6 @@ public class Client
 		try {
 			_saida = new PrintStream(_socket.getOutputStream());
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
@@ -196,7 +189,6 @@ public class Client
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -205,68 +197,6 @@ public class Client
 		nicknameView.exit();
 		System.out.println(nickname);
 		_saida.println(nickname);
-	}
-	
-	void Play()
-	{		
-		while(!_canPlay)
-		{
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}		
-			if(_socket.isClosed())
-			{
-				return;
-			}
-		}
-
-		_saida.println("Start");
-		System.out.println("Digite uma msg: ");
-		String msg = _teclado.nextLine();
-		while(msg.compareTo("###")!=0 && _canPlay) 
-		{
-			_saida.println(msg);
-			msg = _teclado.nextLine();
-		}
-		
-		End();
-	}
-	
-	void Turn()
-	{		
-		while(!_canPlay)
-		{
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}		
-			if(_socket.isClosed())
-			{
-				return;
-			}
-		}
-		
-		_saida.println("Start");
-//		System.out.println("Digite uma msg: ");
-//		String msg = _teclado.nextLine();
-//		if(msg.compareTo("End")!=0 && _canPlay) 
-		{
-//			_saida.println(msg);
-			_saida.println("FimTurno");
-//			System.out.println("mandei fimturno pro server");
-			_canPlay = false;
-			Turn();
-		}
-//		else if(msg.compareTo("End")==0)
-//		{
-//			_canPlay = false;
-//			End();	
-//		}
 	}
 	
 	void End()
@@ -279,31 +209,26 @@ public class Client
 		try {
 			Thread.sleep(500);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		_saida.println("Desconectar");
-//		System.out.println("end after _saida");
 		_saida.close();
-//		System.out.println("end after _saida close");
 
 		try
 		{
 			_teclado.close();
 		}
 		catch (Exception e) {
-			// TODO: handle exception
 			e.printStackTrace();
 		}
 		
-		System.out.println("end after _teclado close");
 		try {
 			_socket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		System.out.println("O cliente terminou de executar!");
 		_boardFrame.dispatchEvent(new WindowEvent(_boardFrame, WindowEvent.WINDOW_CLOSING));
 	}
