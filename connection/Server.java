@@ -50,10 +50,13 @@ public class Server
 		
 		public void RemovePlayer(ServerThread pl)
 		{
-			_players.remove(pl);
 			if(_game != null)
 			{
 				_game.RemovePlayer(pl);
+			}
+			else
+			{
+				_players.remove(pl);
 			}
 		}
 		
