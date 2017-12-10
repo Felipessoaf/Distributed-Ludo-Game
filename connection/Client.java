@@ -85,6 +85,11 @@ public class Client
 			_saida.println("FimTurno");
 			_saida.println("Board " + board);
 		}
+		
+		public void Win()
+		{
+			End();
+		}
 
 		@Override
 		public void windowActivated(WindowEvent e) {

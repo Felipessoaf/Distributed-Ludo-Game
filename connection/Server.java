@@ -249,93 +249,90 @@ public class Server
 				}
 			} while(_nicknames.containsValue(_nickname));
 			
-//			if(in.hasNextLine())
-//			{
-				_nicknames.put(_nicknames.size(), _nickname);
-				if(_rooms.isEmpty() || !_rooms.get(_rooms.size()-1).AddPlayer(this))
+			_nicknames.put(_nicknames.size(), _nickname);
+			if(_rooms.isEmpty() || !_rooms.get(_rooms.size()-1).AddPlayer(this))
+			{
+				_roomId = _rooms.size();
+				_room = new Room(_roomId);
+				_rooms.add(_room);
+				_rooms.get(_roomId).AddPlayer(this);
+				_lock.add(new ReentrantLock());
+			}
+			else
+			{
+				_roomId = _rooms.size()-1;
+				_room = _rooms.get(_roomId);
+			}
+			
+			_timer = new Timer();
+			_timerTask = new TimerTask() {
+				  @Override
+				  public void run() {
+					  if(_canTimeout)
+					  {
+						  _ps.println("Desconectar");
+						  System.out.println("Desconectando");
+						  _canTimeout = false;  
+					  }
+				  }
+			};
+			_timer.schedule(_timerTask, 2*60*1000);
+						
+			System.out.println("Esperando msg do cliente");
+			while (in.hasNextLine()) 
+			{
+				String msg = in.nextLine();
+				System.out.println("Peguei msg do cliente");
+				if(Pattern.matches(msg, "Desconectar"))
 				{
-					_roomId = _rooms.size();
-					_room = new Room(_roomId);
-					_rooms.add(_room);
-					_rooms.get(_roomId).AddPlayer(this);
-					_lock.add(new ReentrantLock());
+					_lock.get(_roomId).lock();
+					try
+					{
+						distribuiMensagem("Desconectando...", _nickname, _room.GetServerThreads(), true);
+						
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						
+						_room.RemovePlayer(this);
+					}
+					finally {
+						_lock.get(_roomId).unlock();
+					}
+				}
+				else if(Pattern.matches(msg, "FimTurno"))
+				{
+					System.out.println("Serverfimturno");
+					_room.EndTurn();
+				} 
+				else if(Pattern.matches(msg, "Start"))
+				{
+					_canTimeout = false;
+					_timerTask.cancel();
+					_timer.cancel();
+				} 
+				else if(Pattern.matches(msg, "Finished"))
+				{
+					_ps.println("Desconectar");
+				} 
+				else if(Pattern.matches(msg, "CloseWindow"))
+				{
+					_room.EndGame();
+				} 
+				else if((msg.matches("Board ((\\d)+,)+")) || (msg.matches("Board ((\\d+),)+")) || (msg.matches("Board (\\d+,)+")))
+				{
+					System.out.println("server board");
+					distribuiMensagem(msg, _nickname, _room.GetServerThreads(), false);
 				}
 				else
 				{
-					_roomId = _rooms.size()-1;
-					_room = _rooms.get(_roomId);
+					System.out.println(_nickname + ": " + msg);
+					distribuiMensagem(msg, _nickname, _room.GetServerThreads(), true);
 				}
-				
-				_timer = new Timer();
-				_timerTask = new TimerTask() {
-					  @Override
-					  public void run() {
-						  if(_canTimeout)
-						  {
-							  _ps.println("Desconectar");
-							  System.out.println("Desconectando");
-							  _canTimeout = false;  
-						  }
-					  }
-				};
-				_timer.schedule(_timerTask, 2*60*1000);
-							
 				System.out.println("Esperando msg do cliente");
-				while (in.hasNextLine()) 
-				{
-					String msg = in.nextLine();
-					System.out.println("Peguei msg do cliente");
-					if(Pattern.matches(msg, "Desconectar"))
-					{
-						_lock.get(_roomId).lock();
-						try
-						{
-							distribuiMensagem("Desconectando...", _nickname, _room.GetServerThreads(), true);
-							
-							try {
-								Thread.sleep(500);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
-							
-							_room.RemovePlayer(this);
-						}
-						finally {
-							_lock.get(_roomId).unlock();
-						}
-					}
-					else if(Pattern.matches(msg, "FimTurno"))
-					{
-						System.out.println("Serverfimturno");
-						_room.EndTurn();
-					} 
-					else if(Pattern.matches(msg, "Start"))
-					{
-						_canTimeout = false;
-						_timerTask.cancel();
-						_timer.cancel();
-					} 
-					else if(Pattern.matches(msg, "Finished"))
-					{
-						_ps.println("Desconectar");
-					} 
-					else if(Pattern.matches(msg, "CloseWindow"))
-					{
-						_room.EndGame();
-					} 
-					else if((msg.matches("Board ((\\d)+,)+")) || (msg.matches("Board ((\\d+),)+")) || (msg.matches("Board (\\d+,)+")))
-					{
-						System.out.println("server board");
-						distribuiMensagem(msg, _nickname, _room.GetServerThreads(), false);
-					}
-					else
-					{
-						System.out.println(_nickname + ": " + msg);
-						distribuiMensagem(msg, _nickname, _room.GetServerThreads(), true);
-					}
-					System.out.println("Esperando msg do cliente");
-				}
-			//}
+			}
 
 			System.out.println("Terminando serverthread");
 			

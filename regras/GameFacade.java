@@ -140,7 +140,8 @@ public class GameFacade implements ObservadoIF, ObservadorIF{
 	void EndGame(){
 		JOptionPane.showMessageDialog(null, "Fim de Jogo\n Ganhador: " + GetCurrentPlayerText()+
 				"\n" + jogo.GetPoints());
-		System.exit(1);
+//		System.exit(1);
+		Game.GetJogo().GetPlayerThread().Win();
 	}
 
 

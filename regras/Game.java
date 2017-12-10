@@ -17,8 +17,14 @@ public class Game implements ObservadoIF{
 	private Pieces piecesclass;
 	private GetByColor getByColor;
 	private List<ObservadorIF> lst = new ArrayList<ObservadorIF>();
-	private ClientThread player;
 	private int playerId;
+	private List<Integer> removedPlayers;
+
+	private ClientThread player;
+	ClientThread GetPlayerThread()
+	{
+		return player;
+	}
 	
 	private int currentPlayer;
 	int GetCurrentPlayer(){return currentPlayer;}
@@ -68,6 +74,7 @@ public class Game implements ObservadoIF{
 	private Game(){
 		piecesclass = Pieces.GetPieces();
 		getByColor = GetByColor.GetGetByColor();
+		removedPlayers = new ArrayList<Integer>();
 	}
 	
 	void StartGamePieces(){
@@ -156,12 +163,16 @@ public class Game implements ObservadoIF{
 		if(GetDiceValue() == 6 && GetCurrentState() != 2 && roundsPlayed < 2) 
 			roundsPlayed++;
 		else{
-			SetCurrentPlayer(GetCurrentPlayer() < 3 ? GetCurrentPlayer()+1 : 0);
+			int nextPlayer = (GetCurrentPlayer() + 1) % 4;
+			while(removedPlayers.contains(nextPlayer))
+			{
+				nextPlayer = (GetCurrentPlayer() + 1) % 4;
+			}
+			SetCurrentPlayer(nextPlayer);
 			roundsPlayed =0;
 		}
 		System.out.println("NextPlayer()");
 		
-		int count = 0;
 		StringBuilder board = new StringBuilder();
 		Pieces piecesInstance = Pieces.GetPieces();
 		for(int [][] allpieces : piecesInstance.GetAll())
@@ -172,7 +183,6 @@ public class Game implements ObservadoIF{
 				{
 					board.append(piece);
 					board.append(",");
-					count++;
 				}	
 			}
 		}
@@ -182,10 +192,6 @@ public class Game implements ObservadoIF{
 		}
 		SetDiceValue(0);
 		SetCurrentState(0);
-		if(playerId == GetCurrentPlayer())
-		{
-//			GameFacade.GetJogoFacade().SetLancarDadoEnabled(true);	
-		}
 	}
 		
 	private int[] PieceSelected(MouseEvent e){
@@ -299,6 +305,7 @@ public class Game implements ObservadoIF{
 		MovePieceFromCurrentToNew(color, decodedPiece, 0);
 		if(AllPiecesAreEnded(color)){
 			GameFacade.GetJogoFacade().EndGame();
+			removedPlayers.add(GetCurrentPlayer());
 		}
 			
 	}
