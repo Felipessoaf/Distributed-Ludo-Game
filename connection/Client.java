@@ -56,11 +56,9 @@ public class Client
 				{
 					System.out.println("meu turno");
 					GameFacade.GetJogoFacade().SetLancarDadoEnabled(true);
-					_canPlay = true;
 				} 
 				else if(Pattern.matches(msg, "Desconectar"))
 				{
-					_canPlay = false;
 					End();
 					break;
 				}
@@ -138,8 +136,6 @@ public class Client
 	private Scanner _teclado;
 	private PrintStream _saida;
 	
-	private boolean _canPlay;
-	
 	private BoardFrame _boardFrame;
 	
 	public PrintStream ps;
@@ -174,8 +170,6 @@ public class Client
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
-		_canPlay = false;
 		
 		new Thread(new ClientThread()).start();
 	}
