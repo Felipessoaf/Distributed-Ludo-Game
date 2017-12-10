@@ -188,13 +188,22 @@ public class Client
 	}
 	
 	void Nickname()
-	{		
+	{	
 		ClientView nicknameView = new ClientView();
 		
-		while(nicknameView.getNickname().isEmpty());
+		while(nicknameView.getNickname().isEmpty())
+		{
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		String nickname = nicknameView.getNickname();
 		nicknameView.exit();
+		System.out.println(nickname);
 		_saida.println(nickname);
 	}
 	

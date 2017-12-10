@@ -4,3 +4,4 @@ bug:
 new:
 -engenharia reversa do diagrama de classe
 -diagrama de sequencia
+-remove winner
